@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cullinan Reader — Weekly meal reservations</title>
+  <meta name="description" content="Parse saved Cullinan cafeteria HTML and view weekly meal reservations." />
+  <meta name="theme-color" content="#000000" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="top-inner">
+        <a href="#" class="logo" onclick="location.reload(); return false;">
+          <span class="logo-mark">C</span>
+          <span>Cullinan<span class="muted">.reader</span></span>
+        </a>
+        <div class="top-actions">
+          <button type="button" class="btn btn-ghost btn-sm" id="btnToday" title="Jump to today">today</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btnReset">reset</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero" id="appEmpty">
+      <p class="hero-label"><span class="prompt">~/cullinan $</span> parse --weekly</p>
+      <h1>Weekly meal reservations</h1>
+      <p class="lead">
+        Drop a saved HTML page from the cafeteria weekly reservation screen.
+        Food names stay in Persian. Past days are marked <em>Ended</em>; open meals you skipped get a red edge.
+      </p>
+
+      <div class="drop" id="dropZone" role="button" tabindex="0" aria-label="Upload HTML file">
+        <h3>Drop Cullinan HTML here</h3>
+        <p>or choose a file · Save As from Reservation.aspx</p>
+        <button type="button" class="btn btn-primary" id="btnBrowse">Choose file</button>
+        <input type="file" id="fileInput" accept=".html,.htm,text/html" />
+      </div>
+      <p class="state" id="parseError"></p>
+    </section>
+
+    <section id="appResults">
+      <div class="week-head">
+        <h2 id="weekTitle">Weekly reservations</h2>
+        <div class="sub" id="weekSub"></div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-num" id="statCount">0</span>
+          <span class="stat-label">reserved meals</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" id="statTotal">0</span>
+          <span class="stat-label">total (Toman)</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" id="statDays">0</span>
+          <span class="stat-label">days with booking</span>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="filters">
+          <button type="button" class="chip active" data-filter="all">all rows</button>
+          <button type="button" class="chip" data-filter="reserved">reserved only</button>
+        </div>
+        <div class="spacer"></div>
+        <button type="button" class="btn btn-ghost btn-sm" id="btnPngAll">png · week</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="btnCsv">csv</button>
+        <button type="button" class="btn btn-ghost btn-sm" id="btnJson">json</button>
+      </div>
+
+      <div class="legend">
+        <span class="lg-ok"><i></i> Reserved</span>
+        <span class="lg-done"><i></i> Done</span>
+        <span class="lg-miss"><i></i> Not reserved</span>
+      </div>
+
+      <div class="days" id="daysList"></div>
+    </section>
+
+    <footer class="foot">
+      <p>local-only · nothing is uploaded</p>
+      <p>dates use your device clock (Jalali)</p>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
