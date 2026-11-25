@@ -526,14 +526,42 @@ function handleFile(file) {
   err.textContent = '';
   err.className = 'state';
 
+  // Mobile browsers often save pages as .mhtml, no extension, or octet-stream.
+  // Do not block by MIME/extension — try to read as text and parse.
+  const name = (file.name || '').toLowerCase();
+  const type = (file.type || '').toLowerCase();
+  const looksBinaryImage =
+    type.startsWith('image/') ||
+    /\.(png|jpe?g|gif|webp|heic)$/i.test(name);
+  if (looksBinaryImage) {
+    err.textContent =
+      'That looks like an image. Save the Cullinan page as HTML / Webpage (not a screenshot), then pick that file.';
+    err.className = 'state error';
+    return;
+  }
+
   const reader = new FileReader();
   reader.onload = () => {
     try {
-      const html = String(reader.result || '');
+      let html = String(reader.result || '');
+      // Some mobile saves wrap HTML; still search for grid ids
+      if (!/cphMain_grdReservation/i.test(html) && /Content-Type:.*text\/html/i.test(html)) {
+        // crude MHTML: take largest HTML-ish chunk
+        const parts = html.split(/------MultipartBoundary/i);
+        let best = html;
+        let bestLen = 0;
+        parts.forEach((part) => {
+          if (/cphMain_grdReservation/i.test(part) && part.length > bestLen) {
+            best = part;
+            bestLen = part.length;
+          }
+        });
+        html = best;
+      }
       const data = extractReservations(html);
       if (!data.items.length) {
         err.textContent =
-          'No reservation tables found. Save the weekly reservation page as HTML and try again.';
+          'No reservation tables found. On phone: share/save the weekly reservation page as “HTML only” or “Webpage”, then select that download (any name is fine).';
         err.className = 'state error';
         return;
       }
